@@ -1,0 +1,11 @@
+midtransclient==1.4.2
+Pillow==11.2.1
+python-dotenv==1.1.0
+Requests==2.32.3
+streamlit==1.45.0
+supabase==2.15.1
+pandas==2.2.2 
+openpyxl
+fastapi==0.111.0
+uvicorn==0.30.1
+xlsxwriter

@@ -1,0 +1,12 @@
+[theme]
+primaryColor = "#b3e7f2"
+backgroundColor = "#f2f5ee"
+secondaryBackgroundColor = "#b3e7f2"
+textColor = "#0b131c"
+
+[server]
+# Mengabaikan folder yang biasanya memiliki banyak file kecil (cache, dll.)
+folderWatchBlacklist = ["__pycache__", ".git", "venv", "assets"]
+
+
+
