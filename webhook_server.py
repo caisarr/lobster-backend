@@ -20,13 +20,14 @@ def record_sales_journal(order_id: int):
     """
     try:
         # 1. CEK DUPLIKASI (IDEMPOTENCY)
+        # Mencegah stok terpotong 2x jika webhook terpanggil ganda
         existing = supabase.table("journal_entries").select("id").eq("order_id", order_id).execute()
         if existing.data:
             print(f"INFO: Jurnal untuk Order {order_id} sudah ada. Skip.")
             return True
 
         # 2. Ambil Detail Pesanan dan Produk
-        # Pastikan kita mengambil kolom 'stock' dari tabel products
+        # [PENTING] Kita tambahkan kolom 'stock' di select query agar tahu stok saat ini
         order_response = supabase.table("orders").select(
             "*, order_items(*, products(id, cost_price, inventory_account_code, hpp_account_code, stock))"
         ).eq("id", order_id).execute()
@@ -89,8 +90,11 @@ def record_sales_journal(order_id: int):
                     "reference_id": f"ORDER-{order_id}",
                 })
                 
-                # C. [PENTING] KURANGI STOK FISIK DI TABEL PRODUCTS
+                # C. [FIX UTAMA] KURANGI STOK FISIK DI TABEL PRODUCTS
                 new_stock = current_stock - quantity_sold
+                # Pastikan stok tidak negatif (opsional, tergantung kebijakan)
+                if new_stock < 0: new_stock = 0 
+                
                 # Update ke Supabase
                 update_res = supabase.table("products").update({"stock": new_stock}).eq("id", product_id).execute()
                 print(f"Update Stok Produk {product_id}: {current_stock} -> {new_stock}")
